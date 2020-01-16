@@ -1,4 +1,4 @@
-$(async function() {
+$(async function () {
   // cache some selectors we'll be using quite a bit
   const $allStoriesList = $("#all-articles-list");
   const $favoritedArticles = $("#favorited-articles");
@@ -26,7 +26,7 @@ $(async function() {
    *  If successfully we will setup the user instance
    */
 
-  $loginForm.on("submit", async function(evt) {
+  $loginForm.on("submit", async function (evt) {
     evt.preventDefault(); // no page-refresh on submit
 
     // grab the username and password
@@ -46,7 +46,7 @@ $(async function() {
    *  If successfully we will setup a new user instance
    */
 
-  $createAccountForm.on("submit", async function(evt) {
+  $createAccountForm.on("submit", async function (evt) {
     evt.preventDefault(); // no page refresh
 
     // grab the required fields
@@ -65,7 +65,7 @@ $(async function() {
    * Log Out Functionality
    */
 
-  $navLogOut.on("click", function() {
+  $navLogOut.on("click", function () {
     // empty out local storage
     localStorage.clear();
     // refresh the page, clearing memory
@@ -76,7 +76,7 @@ $(async function() {
    * Event Handler for Clicking Login
    */
 
-  $navLogin.on("click", function() {
+  $navLogin.on("click", function () {
     // Show the Login and Create Account Forms
     $loginForm.slideToggle();
     $createAccountForm.slideToggle();
@@ -87,7 +87,7 @@ $(async function() {
    * Event handler for Navigation to Homepage
    */
 
-  $("body").on("click", "#nav-all", async function() {
+  $("body").on("click", "#nav-all", async function () {
     hideElements();
     await generateStories();
     $allStoriesList.show();
@@ -98,27 +98,27 @@ $(async function() {
    * Event handler for submit post page
    */
 
-   $("#nav-submit-post").on("click", function(){
-     $submitForm.slideToggle();
-   })
-
-   $("#nav-favorites").on("click", function(){
-     $submitForm.hide();
-     $allStoriesList.hide();
-     $myStories.hide();
-     $favoritedArticles.show();
+  $("#nav-submit-post").on("click", function () {
+    $submitForm.slideToggle();
   })
 
-  $("#nav-my-stories").on("click", function(){
+  $("#nav-favorites").on("click", function () {
+    $submitForm.hide();
+    $allStoriesList.hide();
+    $myStories.hide();
+    $favoritedArticles.show();
+  })
+
+  $("#nav-my-stories").on("click", function () {
     $submitForm.hide();
     $allStoriesList.hide();
     $favoritedArticles.hide();
     $myStories.show();
   })
-/*
-SUBMIT FORM 
-*/
-  $submitForm.on("submit", async function(e){
+  /*
+  SUBMIT FORM 
+  */
+  $submitForm.on("submit", async function (e) {
     e.preventDefault();
     let newStory = {
       author: $("#author").val(),
@@ -127,9 +127,14 @@ SUBMIT FORM
     };
     await storyList.addStory(currentUser, newStory);
     // clear input fields
+    let inputFields = [$("#author"), $("#title"), $("#url")];
+
+    inputFields.forEach(v => v.val(""));
     //slide toggle submit form
+    $submitForm.slideToggle();
     //refresh storylist
-    
+    await generateStories();
+
   })
   /**
    * On page load, checks local storage to see if the user is already logged in.
