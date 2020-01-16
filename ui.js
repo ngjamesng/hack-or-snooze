@@ -2,7 +2,6 @@ $(async function () {
   // cache some selectors we'll be using quite a bit
   const $allStoriesList = $("#all-articles-list");
   const $favoritedArticles = $("#favorited-articles");
-  const $myStories = $("#my-articles");
   // separation 
   const $submitForm = $("#submit-form");
   const $filteredArticles = $("#filtered-articles");
@@ -99,40 +98,57 @@ $(async function () {
    */
 
   $("#nav-submit-post").on("click", function () {
-    $submitForm.slideToggle();
+    $submitForm.hide().slideDown();
+    $allStoriesList.show();
+    $ownStories.hide();
+    $favoritedArticles.hide();
   })
 
   $("#nav-favorites").on("click", function () {
     $submitForm.hide();
     $allStoriesList.hide();
-    $myStories.hide();
+    $ownStories.hide();
     $favoritedArticles.show();
+    if(currentUser.favoriteStories.length > 0) {
+      generateFavoriteStories(currentUser.favoriteStories);
+    }
+    
   })
 
   $("#nav-my-stories").on("click", function () {
     $submitForm.hide();
     $allStoriesList.hide();
     $favoritedArticles.hide();
-    $myStories.show();
+    $ownStories.show();
+    if(currentUser.ownStories.length > 0) {
+      generateOwnStories(currentUser.ownStories);
+    }
   })
+
+  $allStoriesList.on("click", ".fa-star", function(e) {
+    let selectedStory = $(e.target).parent().attr("id");
+    
+    currentUser.addFavoriteStory(selectedStory);
+  });
+
   /*
   SUBMIT FORM 
   */
   $submitForm.on("submit", async function (e) {
     e.preventDefault();
+    // let author = $("#author").val(), title = $("#title").val(), url = $("#url").val();
+    let [author, title, url] = [$("#author").val(), $("#title").val(), $("#url").val()];
+
     let newStory = {
-      author: $("#author").val(),
-      title: $("#title").val(),
-      url: $("#url").val()
+      author,
+      title,
+      url
     };
     await storyList.addStory(currentUser, newStory);
-    // clear input fields
-    let inputFields = [$("#author"), $("#title"), $("#url")];
 
-    inputFields.forEach(v => v.val(""));
-    //slide toggle submit form
+    $submitForm.get(0).reset()
     $submitForm.slideToggle();
-    //refresh storylist
+
     await generateStories();
 
   })
@@ -197,6 +213,22 @@ $(async function () {
     }
   }
 
+  //GENERATE FAVORITE STORIES
+  function generateFavoriteStories(favoriteStories) {
+    for (let story of favoriteStories) {
+      const result = generateStoryHTML(story);
+      $favoritedArticles.append(result);
+    }
+  }
+
+  //GENERATE MY STORIES
+  function generateOwnStories(ownStories) {
+    for (let story of ownStories) {
+      const result = generateStoryHTML(story);
+      $ownStories.append(result);
+    }
+  }
+
   /**
    * A function to render HTML for an individual Story instance
    */
@@ -207,6 +239,7 @@ $(async function () {
     // render story markup
     const storyMarkup = $(`
       <li id="${story.storyId}">
+        <i class="far fa-star"></i>
         <a class="article-link" href="${story.url}" target="a_blank">
           <strong>${story.title}</strong>
         </a>
