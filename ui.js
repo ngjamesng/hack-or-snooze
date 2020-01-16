@@ -126,6 +126,10 @@ SUBMIT FORM
       url: $("#url").val()
     };
     await storyList.addStory(currentUser, newStory);
+    // clear input fields
+    //slide toggle submit form
+    //refresh storylist
+    
   })
   /**
    * On page load, checks local storage to see if the user is already logged in.
