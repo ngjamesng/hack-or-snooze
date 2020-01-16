@@ -1,6 +1,9 @@
 $(async function() {
   // cache some selectors we'll be using quite a bit
   const $allStoriesList = $("#all-articles-list");
+  const $favoritedArticles = $("#favorited-articles");
+  const $myStories = $("#my-articles");
+  // separation 
   const $submitForm = $("#submit-form");
   const $filteredArticles = $("#filtered-articles");
   const $loginForm = $("#login-form");
@@ -98,10 +101,19 @@ $(async function() {
    $("#nav-submit-post").on("click", function(){
      $submitForm.slideToggle();
    })
-//TO DO: BUILD OUT FAVORITES ROUTE THEN FINISH THIS PART 
+
    $("#nav-favorites").on("click", function(){
-    $("#favorited-articles").show();
+     $submitForm.hide();
+     $allStoriesList.hide();
+     $myStories.hide();
+     $favoritedArticles.show();
+  })
+
+  $("#nav-my-stories").on("click", function(){
+    $submitForm.hide();
     $allStoriesList.hide();
+    $favoritedArticles.hide();
+    $myStories.show();
   })
   /**
    * On page load, checks local storage to see if the user is already logged in.
