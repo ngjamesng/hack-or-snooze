@@ -115,6 +115,18 @@ $(async function() {
     $favoritedArticles.hide();
     $myStories.show();
   })
+/*
+SUBMIT FORM 
+*/
+  $submitForm.on("submit", async function(e){
+    e.preventDefault();
+    let newStory = {
+      author: $("#author").val(),
+      title: $("#title").val(),
+      url: $("#url").val()
+    };
+    await storyList.addStory(currentUser, newStory);
+  })
   /**
    * On page load, checks local storage to see if the user is already logged in.
    * Renders page information accordingly.
