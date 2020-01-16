@@ -91,6 +91,19 @@ $(async function() {
   });
 
   /**
+   * 
+   * Event handler for submit post page
+   */
+
+   $("#nav-submit-post").on("click", function(){
+     $submitForm.slideToggle();
+   })
+//TO DO: BUILD OUT FAVORITES ROUTE THEN FINISH THIS PART 
+   $("#nav-favorites").on("click", function(){
+    $("#favorited-articles").show();
+    $allStoriesList.hide();
+  })
+  /**
    * On page load, checks local storage to see if the user is already logged in.
    * Renders page information accordingly.
    */
