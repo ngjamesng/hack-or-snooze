@@ -48,10 +48,10 @@ class StoryList {
 		// this function should return the newly created story so it can be used in
 		// the script.js file where it will be appended to the DOM
 		let storyPostResponse = await axios.post(`${BASE_URL}/stories`, {
-			token : user.loginToken,
-			story : newStory
-    });
-    console.log("STORY POST RESPONSE: ", storyPostResponse);
+			token: user.loginToken,
+			story: newStory
+		});
+		console.log("STORY POST RESPONSE: ", storyPostResponse);
 	}
 }
 
@@ -84,7 +84,7 @@ class User {
 
 	static async create(username, password, name) {
 		const response = await axios.post(`${BASE_URL}/signup`, {
-			user : {
+			user: {
 				username,
 				password,
 				name
@@ -108,7 +108,7 @@ class User {
 
 	static async login(username, password) {
 		const response = await axios.post(`${BASE_URL}/login`, {
-			user : {
+			user: {
 				username,
 				password
 			}
@@ -139,7 +139,7 @@ class User {
 
 		// call the API
 		const response = await axios.get(`${BASE_URL}/users/${username}`, {
-			params : {
+			params: {
 				token
 			}
 		});
