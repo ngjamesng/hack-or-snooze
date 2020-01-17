@@ -158,12 +158,22 @@ class User {
 
 	async addFavoriteStory(storyId) {
 		let token = this.loginToken;
-		console.log("this:", this);
+
 		const response = await axios.post(`${BASE_URL}/users/${this.username}/favorites/${storyId}`, {
 			token
 		});
 
 		return response;
+	}
+
+	async removeFavoriteStory(storyId) {
+		let token = this.loginToken;
+
+		const response = await axios.delete(`${BASE_URL}/users/${this.username}/favorites/${storyId}`, {
+			data : { token }
+		});
+
+		console.log("Removed favorite story?", response);
 	}
 }
 
