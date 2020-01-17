@@ -107,7 +107,6 @@ $(async function() {
 		hideElements();
 		$favoritedArticles.empty().show();
 		if (currentUser.favorites.length > 0) {
-			// if(currentUser.favoriteStories) {
 			generateFavoriteStories(currentUser.favorites);
 		}
 	});
@@ -122,16 +121,13 @@ $(async function() {
 
 	$(".articles-container").on("click", ".fa-star", async function toggleFavorites(e) {
 		let selectedStoryId = $(e.target).parent().attr("id");
-		// let favStoryHTML = $(e.target).parent().html();
-		
+
 		$(e.target).toggleClass("far fas");
-		const response = isInFavorites(selectedStoryId) 
-		? await currentUser.unfavorite(selectedStoryId) 
-		: await currentUser.favorite(selectedStoryId);
-		
-		response.status === 200
-		? (currentUser = await User.getLoggedInUser(currentUser.loginToken, currentUser.username))
-		: null;
+		const response = isFavorited(selectedStoryId)
+			? await currentUser.unfavorite(selectedStoryId)
+			: await currentUser.favorite(selectedStoryId);
+
+		response.status === 200 ? updateCurrentUser() : null;
 	});
 
 	$ownStories.on("click", ".fa-trash", async function removeStory(e) {
@@ -142,32 +138,15 @@ $(async function() {
 
 		response.status === 200 ? selectedStory.remove() : null;
 
-		currentUser = await User.getLoggedInUser(currentUser.loginToken, currentUser.username);
-
-		if (currentUser.favorites.length > 0) {
-			$favoritedArticles.empty();
-			generateFavoriteStories(currentUser.favorites);
-		}
+		updateCurrentUser();
 	});
-
-	function getStoryById(selectedStoryId) {
-		return storyList.stories.find((story) => story.storyId === selectedStoryId);
-	}
-
-	function removeFavoriteLocally(selectedStoryId, favoritesList) {
-		favoritesList = favoritesList.filter((story) => story.storyId !== selectedStoryId);
-		// let storyIndex = favoritesList.findIndex((story) => story.storyId === selectedStoryId);
-		// favoritesList.splice(storyIndex, 1);
-	}
 
 	/*
   SUBMIT FORM 
   */
 	$submitForm.submit(async function(e) {
 		e.preventDefault();
-		// let author = $("#author").val(), title = $("#title").val(), url = $("#url").val();
 		let [ author, title, url ] = [ $("#author").val(), $("#title").val(), $("#url").val() ];
-
 		let story = {
 			author,
 			title,
@@ -175,18 +154,19 @@ $(async function() {
 		};
 		let response = await storyList.addStory(currentUser.loginToken, story);
 
-		let newStory = new Story(response.data.story);
-
 		if (response.status === 201) {
-			currentUser.ownStories.push(newStory);
-			generateOwnStories(currentUser.ownStories);
+			updateCurrentUser();
 		}
 
 		$submitForm.get(0).reset();
 		$submitForm.slideToggle();
 
-		await generateStories();
+		generateStories();
 	});
+	//catchall to refresh current user data for favorites, my stories/deletion
+	async function updateCurrentUser() {
+		currentUser = await User.getLoggedInUser(currentUser.loginToken, currentUser.username);
+	}
 	/**
    * On page load, checks local storage to see if the user is already logged in.
    * Renders page information accordingly.
@@ -243,12 +223,13 @@ $(async function() {
 
 		// loop through all of our stories and generate HTML for them
 		for (let story of storyList.stories) {
-			const isFavorite = isInFavorites(story.storyId);
+			const isFavorite = isFavorited(story.storyId);
 			const result = generateStoryHTML(story, isFavorite);
 			$allStoriesList.append(result);
 		}
 	}
-	function isInFavorites(storyId) {
+
+	function isFavorited(storyId) {
 		if (currentUser) {
 			for (let favorite of currentUser.favorites) {
 				if (storyId === favorite.storyId) {
@@ -262,7 +243,7 @@ $(async function() {
 	//GENERATE FAVORITE STORIES
 	function generateFavoriteStories(favoriteStories) {
 		for (let story of favoriteStories) {
-			const isFavorite = isInFavorites(story.storyId);
+			const isFavorite = isFavorited(story.storyId);
 			const result = generateStoryHTML(story, isFavorite);
 			$favoritedArticles.append(result);
 		}
@@ -271,7 +252,7 @@ $(async function() {
 	//GENERATE MY STORIES
 	function generateOwnStories(ownStories) {
 		for (let story of ownStories) {
-			const isFavorite = isInFavorites(story.storyId);
+			const isFavorite = isFavorited(story.storyId);
 			const result = generateStoryHTML(story, isFavorite, true);
 			$ownStories.append(result);
 		}
@@ -284,8 +265,7 @@ $(async function() {
 	function generateStoryHTML(story, isFavorite, isOwn = false) {
 		let hostName = getHostName(story.url);
 		//starClass "fas" and "far" are font awesome classes.
-		// classname fas === solid star, used for favorited stories
-		//classname far === hollow star, used for not favorited stories
+		// classname fas(solid), for favorites, far(hollow) for others.
 		let starClass = isFavorite ? "fas" : "far";
 		let removeLink = isOwn ? `<i class="fa fa-trash trash-can" aria-hidden="true"></i>` : "";
 
