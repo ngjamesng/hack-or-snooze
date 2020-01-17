@@ -109,8 +109,9 @@ $(async function () {
     $allStoriesList.hide();
     $ownStories.hide();
     $favoritedArticles.show();
-    if(currentUser.favoriteStories.length > 0) {
-      generateFavoriteStories(currentUser.favoriteStories);
+    if(currentUser.favorites.length > 0) {
+      // if(currentUser.favoriteStories) {
+      generateFavoriteStories(currentUser.favorites);
     }
     
   })
@@ -126,9 +127,19 @@ $(async function () {
   })
 
   $allStoriesList.on("click", ".fa-star", function(e) {
-    let selectedStory = $(e.target).parent().attr("id");
+    let selectedStoryid = $(e.target).parent().attr("id");
+    // let favStoryHTML = $(e.target).parent().html();
+    currentUser.addFavoriteStory(selectedStoryid);
+    // add fas class and remove far class if favorited list includes ID
+    //remove far class and remove fas class if favorited list !includes ID
+    if($(e.target).hasClass("far")){
+      $(e.target).addClass("fas").removeClass("far");
+    } else {
+      $(e.target).addClass("far").removeClass("fas");
+    }
     
-    currentUser.addFavoriteStory(selectedStory);
+    
+
   });
 
   /*
@@ -208,9 +219,20 @@ $(async function () {
 
     // loop through all of our stories and generate HTML for them
     for (let story of storyList.stories) {
-      const result = generateStoryHTML(story);
+      const isFavorite = isInFavorites(story);
+      const result = generateStoryHTML(story, isFavorite);
       $allStoriesList.append(result);
     }
+  }
+  function isInFavorites(story){
+    if(currentUser){
+      for(let favorite of currentUser.favorites){
+        if(story.storyId === favorite.storyId){
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   //GENERATE FAVORITE STORIES
@@ -220,6 +242,7 @@ $(async function () {
       $favoritedArticles.append(result);
     }
   }
+
 
   //GENERATE MY STORIES
   function generateOwnStories(ownStories) {
@@ -233,13 +256,14 @@ $(async function () {
    * A function to render HTML for an individual Story instance
    */
 
-  function generateStoryHTML(story) {
+  function generateStoryHTML(story, isFavorite) {
     let hostName = getHostName(story.url);
-
+    let starClass = isFavorite ? "fas" : "far";
+    
     // render story markup
     const storyMarkup = $(`
       <li id="${story.storyId}">
-        <i class="far fa-star"></i>
+        <i class="${starClass} fa-star"></i>
         <a class="article-link" href="${story.url}" target="a_blank">
           <strong>${story.title}</strong>
         </a>
