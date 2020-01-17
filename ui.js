@@ -104,9 +104,7 @@ $(async function() {
 	});
 
 	$("#nav-favorites").on("click", function() {
-		$submitForm.hide();
-		$allStoriesList.hide();
-		$ownStories.hide();
+		hideElements();
 		$favoritedArticles.empty().show();
 		if (currentUser.favorites.length > 0) {
 			// if(currentUser.favoriteStories) {
@@ -115,9 +113,7 @@ $(async function() {
 	});
 
 	$("#nav-my-stories").on("click", function() {
-		$submitForm.hide();
-		$allStoriesList.hide();
-		$favoritedArticles.hide();
+		hideElements();
 		$ownStories.empty().show();
 		if (currentUser.ownStories.length > 0) {
 			generateOwnStories(currentUser.ownStories);
@@ -127,19 +123,15 @@ $(async function() {
 	$(".articles-container").on("click", ".fa-star", async function toggleFavorites(e) {
 		let selectedStoryId = $(e.target).parent().attr("id");
 		// let favStoryHTML = $(e.target).parent().html();
+		
 		$(e.target).toggleClass("far fas");
-		// add fas class and remove far class if favorited list includes ID
-		//add far class and remove fas class if favorited list !includes ID
-		if (isInFavorites(selectedStoryId)) {
-			// $(e.target).addClass("far").removeClass("fas");
-			const response = await currentUser.unfavorite(selectedStoryId);
-			response.status === 200 ? removeFavoriteLocally(selectedStoryId, currentUser.favorites) : null;
-		} else {
-			// $(e.target).addClass("fas").removeClass("far");
-			const response = await currentUser.favorite(selectedStoryId);
-			let selectedStory = getStoryById(selectedStoryId);
-			response.status === 200 ? currentUser.favorites.push(selectedStory) : null;
-		}
+		const response = isInFavorites(selectedStoryId) 
+		? await currentUser.unfavorite(selectedStoryId) 
+		: await currentUser.favorite(selectedStoryId);
+		
+		response.status === 200
+		? (currentUser = await User.getLoggedInUser(currentUser.loginToken, currentUser.username))
+		: null;
 	});
 
 	$ownStories.on("click", ".fa-trash", async function removeStory(e) {
@@ -149,6 +141,13 @@ $(async function() {
 		let response = await storyList.deleteStory(currentUser.loginToken, selectedStoryId);
 
 		response.status === 200 ? selectedStory.remove() : null;
+
+		currentUser = await User.getLoggedInUser(currentUser.loginToken, currentUser.username);
+
+		if (currentUser.favorites.length > 0) {
+			$favoritedArticles.empty();
+			generateFavoriteStories(currentUser.favorites);
+		}
 	});
 
 	function getStoryById(selectedStoryId) {
@@ -316,7 +315,8 @@ $(async function() {
 			$filteredArticles,
 			$ownStories,
 			$loginForm,
-			$createAccountForm
+			$createAccountForm,
+			$favoritedArticles
 		];
 		elementsArr.forEach(($elem) => $elem.hide());
 	}
