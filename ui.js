@@ -127,16 +127,16 @@ $(async function() {
 	$(".articles-container").on("click", ".fa-star", async function toggleFavorites(e) {
 		let selectedStoryId = $(e.target).parent().attr("id");
 		// let favStoryHTML = $(e.target).parent().html();
-
+        $(e.target).toggleClass("far fas");
 		// add fas class and remove far class if favorited list includes ID
 		//add far class and remove fas class if favorited list !includes ID
 		if (isInFavorites(selectedStoryId)) {
-			$(e.target).addClass("far").removeClass("fas");
-			const response = await currentUser.removeFavoriteStory(selectedStoryId);
+			// $(e.target).addClass("far").removeClass("fas");
+			const response = await currentUser.unfavorite(selectedStoryId);
 			response.status === 200 ? removeFavoriteLocally(selectedStoryId, currentUser.favorites) : null;
 		} else {
-			$(e.target).addClass("fas").removeClass("far");
-			const response = await currentUser.addFavoriteStory(selectedStoryId);
+			// $(e.target).addClass("fas").removeClass("far");
+			const response = await currentUser.favorite(selectedStoryId);
 			let selectedStory = getStoryById(selectedStoryId);
 			response.status === 200 ? currentUser.favorites.push(selectedStory) : null;
 		}
@@ -148,8 +148,9 @@ $(async function() {
 	}
 
 	function removeFavoriteLocally(selectedStoryId, favoritesList) {
-		let storyIndex = favoritesList.findIndex((story) => story.storyId === selectedStoryId);
-		favoritesList.splice(storyIndex, 1);
+    favoritesList = favoritesList.filter(story => story.storyId !== selectedStoryId);
+		// let storyIndex = favoritesList.findIndex((story) => story.storyId === selectedStoryId);
+		// favoritesList.splice(storyIndex, 1);
 	}
 
 	/*
