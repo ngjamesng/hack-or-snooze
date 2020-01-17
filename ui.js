@@ -118,7 +118,7 @@ $(async function() {
 		$submitForm.hide();
 		$allStoriesList.hide();
 		$favoritedArticles.hide();
-		$ownStories.show();
+		$ownStories.empty().show();
 		if (currentUser.ownStories.length > 0) {
 			generateOwnStories(currentUser.ownStories);
 		}
@@ -131,10 +131,8 @@ $(async function() {
 		// add fas class and remove far class if favorited list includes ID
 		//add far class and remove fas class if favorited list !includes ID
 		if (isInFavorites(selectedStoryId)) {
-			console.log("removing FAS class");
 			$(e.target).addClass("far").removeClass("fas");
 			const response = await currentUser.removeFavoriteStory(selectedStoryId);
-			console.log("STATUS!!!!: ", response.status);
 			response.status === 200 ? removeFavoriteLocally(selectedStoryId, currentUser.favorites) : null;
 		} else {
 			$(e.target).addClass("fas").removeClass("far");
@@ -249,7 +247,8 @@ $(async function() {
 	//GENERATE FAVORITE STORIES
 	function generateFavoriteStories(favoriteStories) {
 		for (let story of favoriteStories) {
-			const result = generateStoryHTML(story);
+      const isFavorite = isInFavorites(story.storyId);
+			const result = generateStoryHTML(story, isFavorite);
 			$favoritedArticles.append(result);
 		}
 	}
@@ -257,7 +256,8 @@ $(async function() {
 	//GENERATE MY STORIES
 	function generateOwnStories(ownStories) {
 		for (let story of ownStories) {
-			const result = generateStoryHTML(story);
+      const isFavorite = isInFavorites(story.storyId);
+			const result = generateStoryHTML(story, isFavorite);
 			$ownStories.append(result);
 		}
 	}
