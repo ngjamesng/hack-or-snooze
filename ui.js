@@ -140,10 +140,18 @@ $(async function() {
 			let selectedStory = getStoryById(selectedStoryId);
 			response.status === 200 ? currentUser.favorites.push(selectedStory) : null;
 		}
-	});
+  });
+  
+  $ownStories.on("click", ".fa-trash", async function removeStory(e) {
+    let selectedStoryId = $(e.target).parent().attr("id");
+    let selectedStory = $(e.target).parent();
+
+    let response = await storyList.deleteStory(currentUser.loginToken, selectedStoryId);
+    
+    response.status === 200 ? selectedStory.remove() : null;
+  })
 
 	function getStoryById(selectedStoryId) {
-		console.log("storyList:", storyList);
 		return storyList.stories.find((story) => story.storyId === selectedStoryId);
 	}
 
@@ -166,12 +174,18 @@ $(async function() {
 			title,
 			url
 		};
-		await storyList.addStory(currentUser.loginToken, story);
+		let response = await storyList.addStory(currentUser.loginToken, story);
+    await generateStories();
+
+    if (response.status === 201) {
+      currentUser.ownStories.push(response.data.story);
+			generateOwnStories(currentUser.ownStories);
+		}
 
 		$submitForm.get(0).reset();
 		$submitForm.slideToggle();
 
-		await generateStories();
+		
 	});
 	/**
    * On page load, checks local storage to see if the user is already logged in.
@@ -258,7 +272,7 @@ $(async function() {
 	function generateOwnStories(ownStories) {
 		for (let story of ownStories) {
       const isFavorite = isInFavorites(story.storyId);
-			const result = generateStoryHTML(story, isFavorite);
+			const result = generateStoryHTML(story, isFavorite, true);
 			$ownStories.append(result);
 		}
 	}
@@ -267,16 +281,18 @@ $(async function() {
    * A function to render HTML for an individual Story instance
    */
 
-	function generateStoryHTML(story, isFavorite) {
+	function generateStoryHTML(story, isFavorite, isOwn = false) {
 		let hostName = getHostName(story.url);
 		//starClass "fas" and "far" are font awesome classes.
 		// classname fas === solid star, used for favorited stories
 		//classname far === hollow star, used for not favorited stories
-		let starClass = isFavorite ? "fas" : "far";
+    let starClass = isFavorite ? "fas" : "far";
+    let removeLink = isOwn ? `<i class="fa fa-trash trash-can" aria-hidden="true"></i>` : "";
 
 		// render story markup
 		const storyMarkup = $(`
       <li id="${story.storyId}">
+        ${removeLink}
         <i class="${starClass} fa-star"></i>
         <a class="article-link" href="${story.url}" target="a_blank">
           <strong>${story.title}</strong>
