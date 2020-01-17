@@ -154,12 +154,12 @@ $(async function () {
     // let author = $("#author").val(), title = $("#title").val(), url = $("#url").val();
     let [author, title, url] = [$("#author").val(), $("#title").val(), $("#url").val()];
 
-    let newStory = {
+    let story = {
       author,
       title,
       url
     };
-    await storyList.addStory(currentUser, newStory);
+    await storyList.addStory(currentUser.loginToken, story);
 
     $submitForm.get(0).reset()
     $submitForm.slideToggle();
@@ -262,6 +262,9 @@ $(async function () {
 
   function generateStoryHTML(story, isFavorite) {
     let hostName = getHostName(story.url);
+    //starClass "fas" and "far" are font awesome classes.
+    // classname fas === solid star, used for favorited stories
+    //classname far === hollow star, used for not favorited stories
     let starClass = isFavorite ? "fas" : "far";
     
     // render story markup
