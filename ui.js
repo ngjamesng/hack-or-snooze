@@ -174,17 +174,19 @@ $(async function() {
 			title,
 			url
 		};
-		let response = await storyList.addStory(currentUser.loginToken, story);
-    await generateStories();
-
+    let response = await storyList.addStory(currentUser.loginToken, story);
+    
+    let newStory = new Story(response.data.story);
+    
     if (response.status === 201) {
-      currentUser.ownStories.push(response.data.story);
+      currentUser.ownStories.push(newStory);
 			generateOwnStories(currentUser.ownStories);
 		}
-
+    
 		$submitForm.get(0).reset();
 		$submitForm.slideToggle();
-
+    
+    await generateStories();
 		
 	});
 	/**
