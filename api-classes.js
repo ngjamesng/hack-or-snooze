@@ -156,7 +156,7 @@ class User {
 		return existingUser;
 	}
 
-	async addFavoriteStory(storyId) {
+	async favorite(storyId) {
 		let token = this.loginToken;
 
 		const response = await axios.post(`${BASE_URL}/users/${this.username}/favorites/${storyId}`, {
@@ -166,7 +166,7 @@ class User {
 		return response;
 	}
 
-	async removeFavoriteStory(storyId) {
+	async unfavorite(storyId) {
 		let token = this.loginToken;
 
 		const response = await axios.delete(`${BASE_URL}/users/${this.username}/favorites/${storyId}`, {
