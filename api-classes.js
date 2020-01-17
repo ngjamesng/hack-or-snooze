@@ -49,7 +49,7 @@ class StoryList {
 		// the script.js file where it will be appended to the DOM
 		let storyPostResponse = await axios.post(`${BASE_URL}/stories`, {
 			token,
-			story,
+			story
 		});
 		console.log("STORY POST RESPONSE: ", storyPostResponse);
 	}
@@ -173,7 +173,7 @@ class User {
 			data : { token }
 		});
 
-		console.log("Removed favorite story?", response);
+		return response;
 	}
 }
 
