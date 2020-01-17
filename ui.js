@@ -97,7 +97,7 @@ $(async function() {
    */
 
 	$("#nav-submit-post").on("click", function() {
-		$submitForm.hide().slideDown();
+		$submitForm.slideToggle();
 		$allStoriesList.show();
 		$ownStories.hide();
 		$favoritedArticles.hide();
