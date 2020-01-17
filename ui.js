@@ -106,8 +106,8 @@ $(async function() {
 	$("#nav-favorites").on("click", function() {
 		$submitForm.hide();
 		$allStoriesList.hide();
-    $ownStories.hide();
-    $favoritedArticles.empty().show();
+		$ownStories.hide();
+		$favoritedArticles.empty().show();
 		if (currentUser.favorites.length > 0) {
 			// if(currentUser.favoriteStories) {
 			generateFavoriteStories(currentUser.favorites);
@@ -127,7 +127,7 @@ $(async function() {
 	$(".articles-container").on("click", ".fa-star", async function toggleFavorites(e) {
 		let selectedStoryId = $(e.target).parent().attr("id");
 		// let favStoryHTML = $(e.target).parent().html();
-        $(e.target).toggleClass("far fas");
+		$(e.target).toggleClass("far fas");
 		// add fas class and remove far class if favorited list includes ID
 		//add far class and remove fas class if favorited list !includes ID
 		if (isInFavorites(selectedStoryId)) {
@@ -140,23 +140,23 @@ $(async function() {
 			let selectedStory = getStoryById(selectedStoryId);
 			response.status === 200 ? currentUser.favorites.push(selectedStory) : null;
 		}
-  });
-  
-  $ownStories.on("click", ".fa-trash", async function removeStory(e) {
-    let selectedStoryId = $(e.target).parent().attr("id");
-    let selectedStory = $(e.target).parent();
+	});
 
-    let response = await storyList.deleteStory(currentUser.loginToken, selectedStoryId);
-    
-    response.status === 200 ? selectedStory.remove() : null;
-  })
+	$ownStories.on("click", ".fa-trash", async function removeStory(e) {
+		let selectedStoryId = $(e.target).parent().attr("id");
+		let selectedStory = $(e.target).parent();
+
+		let response = await storyList.deleteStory(currentUser.loginToken, selectedStoryId);
+
+		response.status === 200 ? selectedStory.remove() : null;
+	});
 
 	function getStoryById(selectedStoryId) {
 		return storyList.stories.find((story) => story.storyId === selectedStoryId);
 	}
 
 	function removeFavoriteLocally(selectedStoryId, favoritesList) {
-    favoritesList = favoritesList.filter(story => story.storyId !== selectedStoryId);
+		favoritesList = favoritesList.filter((story) => story.storyId !== selectedStoryId);
 		// let storyIndex = favoritesList.findIndex((story) => story.storyId === selectedStoryId);
 		// favoritesList.splice(storyIndex, 1);
 	}
@@ -164,7 +164,7 @@ $(async function() {
 	/*
   SUBMIT FORM 
   */
-	$submitForm.on("submit", async function(e) {
+	$submitForm.submit(async function(e) {
 		e.preventDefault();
 		// let author = $("#author").val(), title = $("#title").val(), url = $("#url").val();
 		let [ author, title, url ] = [ $("#author").val(), $("#title").val(), $("#url").val() ];
@@ -174,20 +174,19 @@ $(async function() {
 			title,
 			url
 		};
-    let response = await storyList.addStory(currentUser.loginToken, story);
-    
-    let newStory = new Story(response.data.story);
-    
-    if (response.status === 201) {
-      currentUser.ownStories.push(newStory);
+		let response = await storyList.addStory(currentUser.loginToken, story);
+
+		let newStory = new Story(response.data.story);
+
+		if (response.status === 201) {
+			currentUser.ownStories.push(newStory);
 			generateOwnStories(currentUser.ownStories);
 		}
-    
+
 		$submitForm.get(0).reset();
 		$submitForm.slideToggle();
-    
-    await generateStories();
-		
+
+		await generateStories();
 	});
 	/**
    * On page load, checks local storage to see if the user is already logged in.
@@ -264,7 +263,7 @@ $(async function() {
 	//GENERATE FAVORITE STORIES
 	function generateFavoriteStories(favoriteStories) {
 		for (let story of favoriteStories) {
-      const isFavorite = isInFavorites(story.storyId);
+			const isFavorite = isInFavorites(story.storyId);
 			const result = generateStoryHTML(story, isFavorite);
 			$favoritedArticles.append(result);
 		}
@@ -273,7 +272,7 @@ $(async function() {
 	//GENERATE MY STORIES
 	function generateOwnStories(ownStories) {
 		for (let story of ownStories) {
-      const isFavorite = isInFavorites(story.storyId);
+			const isFavorite = isInFavorites(story.storyId);
 			const result = generateStoryHTML(story, isFavorite, true);
 			$ownStories.append(result);
 		}
@@ -288,8 +287,8 @@ $(async function() {
 		//starClass "fas" and "far" are font awesome classes.
 		// classname fas === solid star, used for favorited stories
 		//classname far === hollow star, used for not favorited stories
-    let starClass = isFavorite ? "fas" : "far";
-    let removeLink = isOwn ? `<i class="fa fa-trash trash-can" aria-hidden="true"></i>` : "";
+		let starClass = isFavorite ? "fas" : "far";
+		let removeLink = isOwn ? `<i class="fa fa-trash trash-can" aria-hidden="true"></i>` : "";
 
 		// render story markup
 		const storyMarkup = $(`
