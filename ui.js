@@ -126,16 +126,20 @@ $(async function () {
     }
   })
 
-  $allStoriesList.on("click", ".fa-star", function(e) {
+  $allStoriesList.on("click", ".fa-star", function toggleFavorites(e) {
     let selectedStoryid = $(e.target).parent().attr("id");
     // let favStoryHTML = $(e.target).parent().html();
-    currentUser.addFavoriteStory(selectedStoryid);
+    
     // add fas class and remove far class if favorited list includes ID
     //remove far class and remove fas class if favorited list !includes ID
-    if($(e.target).hasClass("far")){
-      $(e.target).addClass("fas").removeClass("far");
-    } else {
+    if(isInFavorites(selectedStoryid)){
+      console.log("removing FAS class")
       $(e.target).addClass("far").removeClass("fas");
+      currentUser.removeFavoriteStory(selectedStoryid);
+    } else {
+      console.log("adding FAS class")
+      $(e.target).addClass("fas").removeClass("far");
+      currentUser.addFavoriteStory(selectedStoryid);
     }
     
     
@@ -219,15 +223,15 @@ $(async function () {
 
     // loop through all of our stories and generate HTML for them
     for (let story of storyList.stories) {
-      const isFavorite = isInFavorites(story);
+      const isFavorite = isInFavorites(story.storyId);
       const result = generateStoryHTML(story, isFavorite);
       $allStoriesList.append(result);
     }
   }
-  function isInFavorites(story){
+  function isInFavorites(storyId){
     if(currentUser){
       for(let favorite of currentUser.favorites){
-        if(story.storyId === favorite.storyId){
+        if(storyId === favorite.storyId){
           return true;
         }
       }
