@@ -51,8 +51,16 @@ class StoryList {
 			token,
 			story
 		});
-		console.log("STORY POST RESPONSE: ", storyPostResponse);
-	}
+		return storyPostResponse;
+    }
+    
+    async deleteStory(token, storyId) {
+        let storyDeleteResponse = await axios.delete(`${BASE_URL}/stories/${storyId}`, {
+            data : { token }
+        })
+
+        return storyDeleteResponse;
+    }
 }
 
 /**
