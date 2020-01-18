@@ -230,16 +230,8 @@ $(async function() {
 	}
 
 	function isFavorited(storyId) {
-		if (currentUser) {
-			for (let favorite of currentUser.favorites) {
-				if (storyId === favorite.storyId) {
-					return true;
-				}
-			}
-		}
-		return false;
+		return currentUser ? currentUser.favorites.some((favId) => favId.storyId === storyId) : null;
 	}
-
 	//GENERATE FAVORITE STORIES
 	function generateFavoriteStories(favoriteStories) {
 		for (let story of favoriteStories) {
