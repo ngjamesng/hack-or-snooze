@@ -52,15 +52,15 @@ class StoryList {
 			story
 		});
 		return storyPostResponse;
-    }
-    
-    async deleteStory(token, storyId) {
-        let storyDeleteResponse = await axios.delete(`${BASE_URL}/stories/${storyId}`, {
-            data : { token }
-        })
+	}
 
-        return storyDeleteResponse;
-    }
+	async deleteStory(token, storyId) {
+		let storyDeleteResponse = await axios.delete(`${BASE_URL}/stories/${storyId}`, {
+			data : { token }
+		});
+
+		return storyDeleteResponse;
+	}
 }
 
 /**
@@ -115,13 +115,16 @@ class User {
    */
 
 	static async login(username, password) {
-		const response = await axios.post(`${BASE_URL}/login`, {
-			user : {
-				username,
-				password
-			}
-		});
-
+		const response = await axios
+			.post(`${BASE_URL}/login`, {
+				user : {
+					username,
+					password
+				}
+			})
+			.catch((e) => {
+				console.log("event", e.response);
+			});
 		// build a new User instance from the API response
 		const existingUser = new User(response.data.user);
 
@@ -133,6 +136,26 @@ class User {
 		existingUser.loginToken = response.data.token;
 
 		return existingUser;
+
+		/**ORIGINAL CODE BELOW */
+		// const response = await axios.post(`${BASE_URL}/login`, {
+		// 	user : {
+		// 		username,
+		// 		password
+		// 	}
+		// }
+		// );
+		// // build a new User instance from the API response
+		// const existingUser = new User(response.data.user);
+
+		// // instantiate Story instances for the user's favorites and ownStories
+		// existingUser.favorites = response.data.user.favorites.map((s) => new Story(s));
+		// existingUser.ownStories = response.data.user.stories.map((s) => new Story(s));
+
+		// // attach the token to the newUser instance for convenience
+		// existingUser.loginToken = response.data.token;
+
+		// return existingUser;
 	}
 
 	/** Get user instance for the logged-in-user.
